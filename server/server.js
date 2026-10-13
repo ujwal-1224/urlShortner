@@ -2,12 +2,11 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import urlRoutes from "./routes/url.js";
+import { redirectUrl } from "./controllers/urlController.js";
 
 // Load environment variables from .env into process.env
 dotenv.config();
-
-// Connect to MongoDB
-await connectDB();
 
 // Create the Express application
 const app = express();
@@ -24,9 +23,17 @@ app.get("/", (req, res) => {
   res.json({ message: "URL Shortener API is running" });
 });
 
-// --- Start the Server ---
-const PORT = process.env.PORT || 5000;
+// --- API Routes ---
+app.use("/api/url", urlRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+// --- Redirect Route (must be after /api routes) ---
+app.get("/:code", redirectUrl);
+
+// --- Connect to DB, then Start the Server ---
+const PORT = process.env.PORT || 3000;
+
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });
