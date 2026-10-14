@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import urlRoutes from "./routes/url.js";
 import { redirectUrl } from "./controllers/urlController.js";
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 // Load environment variables from .env into process.env
 dotenv.config();
@@ -28,6 +29,10 @@ app.use("/api/url", urlRoutes);
 
 // --- Redirect Route (must be after /api routes) ---
 app.get("/:code", redirectUrl);
+
+// --- 404 & Centralized Error Handling Middleware ---
+app.use(notFound);
+app.use(errorHandler);
 
 // --- Connect to DB, then Start the Server ---
 const PORT = process.env.PORT || 3000;
